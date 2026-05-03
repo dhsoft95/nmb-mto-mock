@@ -82,7 +82,7 @@
             margin-left: 260px;
             flex: 1;
             padding: 40px;
-            max-width: 900px;
+            max-width: 1200px;
         }
 
         .page-header {
@@ -176,6 +176,7 @@
             font-family: 'Courier New', monospace;
             font-size: 13px;
             color: #e2e8f0;
+            word-break: break-all;
         }
 
         .endpoint-body {
@@ -380,6 +381,12 @@
             color: #fdba74;
         }
 
+        .alert-success {
+            background: #14532d;
+            border: 1px solid #166534;
+            color: #4ade80;
+        }
+
         .fsp-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -409,6 +416,15 @@
         .fsp-type-bank { border-left: 3px solid #60a5fa; }
         .fsp-type-mno  { border-left: 3px solid #4ade80; }
 
+        .nin-badge {
+            font-family: 'Courier New', monospace;
+            background: #1e2235;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #f97316;
+        }
+
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #0f1117; }
         ::-webkit-scrollbar-thumb { background: #2d3148; border-radius: 3px; }
@@ -424,12 +440,15 @@
     <ul class="sidebar-nav">
         <li class="sidebar-section">Getting Started</li>
         <li><a href="#introduction" class="active">Introduction</a></li>
+        <li><a href="#base-url">Base URL</a></li>
         <li><a href="#authentication">Authentication</a></li>
         <li class="sidebar-section">Endpoints</li>
         <li><a href="#account-lookup">Account Lookup</a></li>
+        <li><a href="#nida-verification">ID Verification</a></li>
         <li class="sidebar-section">Reference</li>
         <li><a href="#response-codes">Response Codes</a></li>
         <li><a href="#supported-fsps">Supported FSPs</a></li>
+        <li><a href="#test-nins">Test NINs</a></li>
     </ul>
 </aside>
 
@@ -444,12 +463,27 @@
     <div class="section" id="introduction">
         <div class="section-title">Introduction</div>
         <p>
-            The Chungwa MTO API enables integration partners to perform account lookups and fund transfers
-            through a secure and standardized interface. This documentation covers all available endpoints,
-            request and response formats, authentication requirements, and supported FSPs.
+            The Chungwa MTO API enables integration partners to perform account lookups, fund transfers,
+            and NIDA identity verification through a secure and standardized interface. This documentation
+            covers all available endpoints, request and response formats, authentication requirements, and supported FSPs.
         </p>
         <div class="alert alert-warning">
             All requests must include valid authentication headers. Requests without credentials will be rejected.
+        </div>
+    </div>
+
+    <!-- Base URL -->
+    <div class="section" id="base-url">
+        <div class="section-title">Base URL</div>
+        <p>All API requests should be made to the following base URL:</p>
+        <div class="code-block">
+            <div class="code-block-header">
+                <span class="code-block-label">Test</span>
+            </div>
+            <pre>https://www.connect.chungwa.co.tz</pre>
+        </div>
+        <div class="alert alert-info">
+            All endpoints are relative to this base URL. Ensure all requests are made over HTTPS.
         </div>
     </div>
 
@@ -488,7 +522,7 @@ password: @Dmin2021!</pre>
         <div class="endpoint-card">
             <div class="endpoint-header">
                 <span class="method-badge method-post">POST</span>
-                <span class="endpoint-url">/api/chungwa/v1.0/customer-lookup</span>
+                <span class="endpoint-url">https://www.connect.chungwa.co.tz/api/chungwa/v1.0/customer-lookup</span>
             </div>
             <div class="endpoint-body">
                 <p>
@@ -529,7 +563,7 @@ password: @Dmin2021!</pre>
                         <td class="param-name">identifierType</td>
                         <td>string</td>
                         <td><span class="required-badge">Required</span></td>
-                        <td>Type of identifier: <code style="color:#f97316">BANK</code> or <code style="color:#f97316">MSISDN</code></td>
+                        <td>Type of identifier: <code style="color:#f97316">BANK</code> or <code style="color:#f97316">MSISDN</code> or <code style="color:#f97316">NIN</code></td>
                     </tr>
                     <tr>
                         <td class="param-name">destinationFsp</td>
@@ -545,7 +579,15 @@ password: @Dmin2021!</pre>
                     <div class="code-block-header">
                         <span class="code-block-label">JSON Request</span>
                     </div>
-                    <pre>{
+                    <pre>POST https://www.connect.chungwa.co.tz/api/chungwa/v1.0/customer-lookup
+
+Headers:
+  Content-Type: application/json
+  username: chungwa
+  password: @Dmin2021!
+
+Body:
+{
     "clientID": "client001",
     "requestID": "123456",
     "identifier": "00000121",
@@ -648,73 +690,180 @@ password: @Dmin2021!</pre>
     "responsedescription": "Account not found"
 }</pre>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="code-block">
-                    <div class="code-block-header">
-                        <span class="code-block-label">Unauthorized Response (401)</span>
-                    </div>
-                    <pre>{
-    "responsecode": "54",
-    "responsedescription": "Unauthorized: Invalid credentials"
-}</pre>
-                </div>
+    <!-- NIDA Verification -->
+    <div class="section" id="nida-verification">
+        <div class="section-title">NIDA Verification</div>
 
-                <h4 style="color:#f1f5f9; font-size:13px; margin-bottom:12px; margin-top:20px;">Test Accounts</h4>
+        <div class="alert alert-info">
+            <strong>Mock Service Notice:</strong> This is a simulated NIDA verification service for testing purposes.
+            Maximum of 3 attempts allowed per verification session.
+        </div>
+
+        <!-- Step 1: Initiate -->
+        <div class="endpoint-card">
+            <div class="endpoint-header">
+                <span class="method-badge method-post">POST</span>
+                <span class="endpoint-url">https://www.connect.chungwa.co.tz/api/chungwa/v1.0/nida/initiate</span>
+            </div>
+            <div class="endpoint-body">
+                <p>
+                    Step 1: Initiate NIDA verification by providing a valid NIN (20 digits).
+                    The system will return a security question that must be answered correctly.
+                </p>
+
+                <h4 style="color:#f1f5f9; font-size:13px; margin-bottom:12px;">Request Parameters</h4>
                 <table class="params-table">
                     <thead>
                     <tr>
-                        <th>Identifier</th>
+                        <th>Parameter</th>
                         <th>Type</th>
-                        <th>FSP</th>
-                        <th>Name</th>
-                        <th>Category</th>
+                        <th>Required</th>
+                        <th>Description</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
-                        <td class="param-name">00000121</td>
-                        <td>BANK</td>
-                        <td>CRDB</td>
-                        <td>Andendekisye Shekimweri</td>
-                        <td>PERSON</td>
-                    </tr>
-                    <tr>
-                        <td class="param-name">24110000296</td>
-                        <td>BANK</td>
-                        <td>NMB</td>
-                        <td>Mwinyi Kazimoto</td>
-                        <td>PERSON</td>
-                    </tr>
-                    <tr>
-                        <td class="param-name">255621804189</td>
-                        <td>MSISDN</td>
-                        <td>MPESA</td>
-                        <td>Fatuma Said Ally</td>
-                        <td>PERSON</td>
-                    </tr>
-                    <tr>
-                        <td class="param-name">255784000111</td>
-                        <td>MSISDN</td>
-                        <td>AIRTEL</td>
-                        <td>Juma Hassan Mbwana</td>
-                        <td>PERSON</td>
-                    </tr>
-                    <tr>
-                        <td class="param-name">01258796325</td>
-                        <td>BANK</td>
-                        <td>EXIM</td>
-                        <td>Karibu Supplies Ltd</td>
-                        <td>BUSINESS</td>
-                    </tr>
-                    <tr>
-                        <td class="param-name">255754000222</td>
-                        <td>MSISDN</td>
-                        <td>TIGO</td>
-                        <td>Mariam Juma Salehe</td>
-                        <td>PERSON</td>
+                        <td class="param-name">nin</td>
+                        <td>string</td>
+                        <td><span class="required-badge">Required</span></td>
+                        <td>20-digit National ID Number (NIN)</td>
                     </tr>
                     </tbody>
                 </table>
+
+                <h4 style="color:#f1f5f9; font-size:13px; margin-bottom:12px;">Request Example</h4>
+                <div class="code-block">
+                    <div class="code-block-header">
+                        <span class="code-block-label">JSON Request</span>
+                    </div>
+                    <pre>POST https://www.connect.chungwa.co.tz/api/chungwa/v1.0/nida/initiate
+
+Headers:
+  Content-Type: application/json
+  username: chungwa
+  password: @Dmin2021!
+
+Body:
+{
+    "nin": "19900101123456789012"
+}</pre>
+                </div>
+
+                <h4 style="color:#f1f5f9; font-size:13px; margin-bottom:12px;">Response Example</h4>
+                <div class="code-block">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Success Response (200)</span>
+                    </div>
+                    <pre>{
+    "responsecode": "00",
+    "responsedescription": "Verification initiated",
+    "session_id": "nida_67a3b8c1d4e2f_abc123def456",
+    "question": "What is your mother's name?",
+    "remaining_attempts": 3
+}</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Verify -->
+        <div class="endpoint-card">
+            <div class="endpoint-header">
+                <span class="method-badge method-post">POST</span>
+                <span class="endpoint-url">https://www.connect.chungwa.co.tz/api/chungwa/v1.0/nida/verify</span>
+            </div>
+            <div class="endpoint-body">
+                <p>
+                    Step 2: Answer the security question to complete verification.
+                    You have a maximum of 3 attempts. After 3 failed attempts, the session expires.
+                </p>
+
+                <h4 style="color:#f1f5f9; font-size:13px; margin-bottom:12px;">Request Parameters</h4>
+                <table class="params-table">
+                    <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="param-name">session_id</td>
+                        <td>string</td>
+                        <td><span class="required-badge">Required</span></td>
+                        <td>Session ID returned from initiate endpoint</td>
+                    </tr>
+                    <tr>
+                        <td class="param-name">answer</td>
+                        <td>string</td>
+                        <td><span class="required-badge">Required</span></td>
+                        <td>Answer to the security question</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <h4 style="color:#f1f5f9; font-size:13px; margin-bottom:12px;">Request Example</h4>
+                <div class="code-block">
+                    <div class="code-block-header">
+                        <span class="code-block-label">JSON Request</span>
+                    </div>
+                    <pre>POST https://www.connect.chungwa.co.tz/api/chungwa/v1.0/nida/verify
+
+Headers:
+  Content-Type: application/json
+  username: chungwa
+  password: @Dmin2021!
+
+Body:
+{
+    "session_id": "nida_67a3b8c1d4e2f_abc123def456",
+    "answer": "Maria Shekimweri"
+}</pre>
+                </div>
+
+                <h4 style="color:#f1f5f9; font-size:13px; margin-bottom:12px;">Response Examples</h4>
+
+                <div class="code-block">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Success Response (200)</span>
+                    </div>
+                    <pre>{
+    "responsecode": "00",
+    "responsedescription": "NIDA verification successful",
+    "user_info": {
+        "nin": "19900101123456789012",
+        "full_name": "Andendekisye Shekimweri",
+        "date_of_birth": "1985-05-15"
+    }
+}</pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Incorrect Answer Response (400)</span>
+                    </div>
+                    <pre>{
+    "responsecode": "54",
+    "responsedescription": "Incorrect answer",
+    "remaining_attempts": 2
+}</pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-block-header">
+                        <span class="code-block-label">Max Attempts Exceeded Response (403)</span>
+                    </div>
+                    <pre>{
+    "responsecode": "54",
+    "responsedescription": "Maximum attempts exceeded. Verification failed.",
+    "remaining_attempts": 0
+}</pre>
+                </div>
             </div>
         </div>
     </div>
@@ -778,6 +927,78 @@ password: @Dmin2021!</pre>
             <div class="fsp-card fsp-type-mno"><div class="fsp-code">504</div><div class="fsp-name">AIRTEL</div></div>
             <div class="fsp-card fsp-type-mno"><div class="fsp-code">501</div><div class="fsp-name">TIGO / ZANTEL</div></div>
             <div class="fsp-card fsp-type-mno"><div class="fsp-code">506</div><div class="fsp-name">HALOTEL</div></div>
+        </div>
+    </div>
+
+    <!-- Test NINs -->
+    <div class="section" id="test-nins">
+        <div class="section-title">Test NINs for Verification</div>
+{{--        <p>Use these test NINs to simulate NIDA verification with the mock service:</p>--}}
+
+        <table class="params-table">
+            <thead>
+            <tr>
+                <th>NIN (20 digits)</th>
+                <th>Full Name</th>
+                <th>Mother's Name (Answer)</th>
+                <th>Birth Place (Alternate)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="param-name">19900101123456789012</td>
+                <td>Andendekisye Shekimweri</td>
+                <td>Maria Shekimweri</td>
+                <td>Mbeya</td>
+            </tr>
+            <tr>
+                <td class="param-name">19900515234567890123</td>
+                <td>Mwinyi Kazimoto</td>
+                <td>Aisha Kazimoto</td>
+                <td>Dar es Salaam</td>
+            </tr>
+            <tr>
+                <td class="param-name">19991234567890123456</td>
+                <td>Fatuma Said Ally</td>
+                <td>Zainab Ally</td>
+                <td>Zanzibar</td>
+            </tr>
+            <tr>
+                <td class="param-name">19880321123456789123</td>
+                <td>John Peter Mbwambo</td>
+                <td>Anna Mbwambo</td>
+                <td>Arusha</td>
+            </tr>
+            <tr>
+                <td class="param-name">19951210123456789456</td>
+                <td>Sarah Hassan Juma</td>
+                <td>Fatma Hassan</td>
+                <td>Tanga</td>
+            </tr>
+            <tr>
+                <td class="param-name">19820115123456789789</td>
+                <td>Richard Samson Mtei</td>
+                <td>Grace Mtei</td>
+                <td>Kilimanjaro</td>
+            </tr>
+            <tr>
+                <td class="param-name">20000505123456789034</td>
+                <td>Amina Iddi Rashid</td>
+                <td>Mwanaisha Rashid</td>
+                <td>Morogoro</td>
+            </tr>
+            <tr>
+                <td class="param-name">19781120123456789234</td>
+                <td>Hamza Abdallah Kigoda</td>
+                <td>Zainabu Kigoda</td>
+                <td>Dodoma</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="alert alert-success" style="margin-top: 16px;">
+            <strong>Note:</strong> The verification question will randomly ask for either "Mother's name" or "Birth place".
+            Answer exactly as shown in the table above (case-sensitive matching).
         </div>
     </div>
 
