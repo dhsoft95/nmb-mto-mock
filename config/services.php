@@ -22,6 +22,13 @@ return [
         'key' => env('RESEND_API_KEY'),
     ],
 
+    'monex_kyc' => [
+        'base_url'        => env('MONEX_KYC_BASE_URL', 'https://kyc.monex.co.tz'),
+        'api_key'         => env('MONEX_KYC_API_KEY'),
+        'timeout'         => env('MONEX_KYC_TIMEOUT', 30),
+        'connect_timeout' => env('MONEX_KYC_CONNECT_TIMEOUT', 10),
+    ],
+
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),

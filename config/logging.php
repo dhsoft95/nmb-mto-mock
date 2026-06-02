@@ -52,6 +52,15 @@ return [
 
     'channels' => [
 
+
+        'mto' => [
+            'driver' => 'daily',
+            'path'   => storage_path('logs/mto.log'),
+            'level'  => env('LOG_LEVEL', 'debug'),
+            'days'   => 14,
+            'replace_placeholders' => true,
+        ],
+
         'stack' => [
             'driver' => 'stack',
             'channels' => explode(',', (string) env('LOG_STACK', 'single')),
