@@ -124,7 +124,7 @@ class AccountLookupController extends Controller
             'responsedescription' => 'SUCCESS',
             'identifierType'      => $identifierType,
             'identifier'          => $identifier,
-            'fspId'               => $bankName,
+            'fspId'               => $destinationFsp,
             'fullName'            => $result['name'],
             'accountCategory'     => null,
             'accountType'         => null,
@@ -155,8 +155,8 @@ class AccountLookupController extends Controller
             'MPESA'    => 'VODACOM',
             'HALOPESA' => 'HALOPESA',
             'HALOTEL'  => 'HALOPESA',
-            'AZAMPESA' => 'AZAMPESA',
-            'AZAM'     => 'AZAMPESA',
+            'AZAMPESA' => 'Azampesa',
+            'AZAM'     => 'Azampesa',
         ];
 
         $key = strtoupper(trim($destinationFsp));
