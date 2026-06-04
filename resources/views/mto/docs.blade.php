@@ -346,6 +346,7 @@
         .code-01 { background: #1e3a5f; color: #60a5fa; }
         .code-54 { background: #450a0a; color: #f87171; }
         .code-55 { background: #2d1a0e; color: #fb923c; }
+        .code-96 { background: #1a1330; color: #c084fc; }
 
         .code-info h4 {
             font-size: 13px;
@@ -444,11 +445,9 @@
         <li><a href="#authentication">Authentication</a></li>
         <li class="sidebar-section">Endpoints</li>
         <li><a href="#account-lookup">Account Lookup</a></li>
-        <li><a href="#nida-verification">ID Verification</a></li>
         <li class="sidebar-section">Reference</li>
         <li><a href="#response-codes">Response Codes</a></li>
         <li><a href="#supported-fsps">Supported FSPs</a></li>
-        <li><a href="#test-nins">Test NINs</a></li>
     </ul>
 </aside>
 
@@ -463,9 +462,9 @@
     <div class="section" id="introduction">
         <div class="section-title">Introduction</div>
         <p>
-            The Chungwa MTO API enables integration partners to perform account lookups, fund transfers,
-            and NIDA identity verification through a secure and standardized interface. This documentation
-            covers all available endpoints, request and response formats, authentication requirements, and supported FSPs.
+            The Chungwa MTO API enables integration partners to perform account lookups and fund transfers
+            through a secure and standardized interface. This documentation covers all available endpoints,
+            request and response formats, authentication requirements, and supported FSPs.
         </p>
         <div class="alert alert-warning">
             All requests must include valid authentication headers. Requests without credentials will be rejected.
@@ -498,11 +497,11 @@
             <h4>Test Credentials</h4>
             <div class="auth-row">
                 <span class="auth-key">username</span>
-                <span class="auth-value">chungwa</span>
+                <span class="auth-value">chungwa90</span>
             </div>
             <div class="auth-row">
                 <span class="auth-key">password</span>
-                <span class="auth-value">@Dmin2021!</span>
+                <span class="auth-value">**********</span>
             </div>
         </div>
         <div class="code-block">
@@ -569,7 +568,7 @@ password: @Dmin2021!</pre>
                         <td class="param-name">destinationFsp</td>
                         <td>string</td>
                         <td><span class="optional-badge">Optional</span></td>
-                        <td>FSP code of the destination institution e.g <code style="color:#f97316">003</code> for CRDB</td>
+                        <td>Accepts numeric code (e.g. <code style="color:#f97316">507</code>) or FSP name (e.g. <code style="color:#f97316">AZAMPESA</code>). Case-insensitive. See Supported FSPs table.</td>
                     </tr>
                     </tbody>
                 </table>
@@ -642,7 +641,7 @@ Body:
                         <td><code style="color:#f97316">PERSON</code> or <code style="color:#f97316">BUSINESS</code></td>
                     </tr>
                     <tr>
-                        <td class="param-name">accountType</td>
+                        <td class="param-name">accountType</td> 2
                         <td>string</td>
                         <td><code style="color:#f97316">BANK</code> or <code style="color:#f97316">WALLET</code></td>
                     </tr>
@@ -694,180 +693,6 @@ Body:
         </div>
     </div>
 
-    <!-- NIDA Verification -->
-    <div class="section" id="nida-verification">
-        <div class="section-title">NIDA Verification</div>
-
-        <div class="alert alert-info">
-            <strong>Mock Service Notice:</strong> This is a simulated NIDA verification service for testing purposes.
-            Maximum of 3 attempts allowed per verification session.
-        </div>
-
-        <!-- Step 1: Initiate -->
-        <div class="endpoint-card">
-            <div class="endpoint-header">
-                <span class="method-badge method-post">POST</span>
-                <span class="endpoint-url">https://www.connect.chungwa.co.tz/api/chungwa/v1.0/nida/initiate</span>
-            </div>
-            <div class="endpoint-body">
-                <p>
-                    Step 1: Initiate NIDA verification by providing a valid NIN (20 digits).
-                    The system will return a security question that must be answered correctly.
-                </p>
-
-                <h4 style="color:#f1f5f9; font-size:13px; margin-bottom:12px;">Request Parameters</h4>
-                <table class="params-table">
-                    <thead>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Type</th>
-                        <th>Required</th>
-                        <th>Description</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td class="param-name">nin</td>
-                        <td>string</td>
-                        <td><span class="required-badge">Required</span></td>
-                        <td>20-digit National ID Number (NIN)</td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <h4 style="color:#f1f5f9; font-size:13px; margin-bottom:12px;">Request Example</h4>
-                <div class="code-block">
-                    <div class="code-block-header">
-                        <span class="code-block-label">JSON Request</span>
-                    </div>
-                    <pre>POST https://www.connect.chungwa.co.tz/api/chungwa/v1.0/nida/initiate
-
-Headers:
-  Content-Type: application/json
-  username: chungwa
-  password: @Dmin2021!
-
-Body:
-{
-    "nin": "19900101123456789012"
-}</pre>
-                </div>
-
-                <h4 style="color:#f1f5f9; font-size:13px; margin-bottom:12px;">Response Example</h4>
-                <div class="code-block">
-                    <div class="code-block-header">
-                        <span class="code-block-label">Success Response (200)</span>
-                    </div>
-                    <pre>{
-    "responsecode": "00",
-    "responsedescription": "Verification initiated",
-    "session_id": "nida_67a3b8c1d4e2f_abc123def456",
-    "question": "What is your mother's name?",
-    "remaining_attempts": 3
-}</pre>
-                </div>
-            </div>
-        </div>
-
-        <!-- Step 2: Verify -->
-        <div class="endpoint-card">
-            <div class="endpoint-header">
-                <span class="method-badge method-post">POST</span>
-                <span class="endpoint-url">https://www.connect.chungwa.co.tz/api/chungwa/v1.0/nida/verify</span>
-            </div>
-            <div class="endpoint-body">
-                <p>
-                    Step 2: Answer the security question to complete verification.
-                    You have a maximum of 3 attempts. After 3 failed attempts, the session expires.
-                </p>
-
-                <h4 style="color:#f1f5f9; font-size:13px; margin-bottom:12px;">Request Parameters</h4>
-                <table class="params-table">
-                    <thead>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Type</th>
-                        <th>Required</th>
-                        <th>Description</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td class="param-name">session_id</td>
-                        <td>string</td>
-                        <td><span class="required-badge">Required</span></td>
-                        <td>Session ID returned from initiate endpoint</td>
-                    </tr>
-                    <tr>
-                        <td class="param-name">answer</td>
-                        <td>string</td>
-                        <td><span class="required-badge">Required</span></td>
-                        <td>Answer to the security question</td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <h4 style="color:#f1f5f9; font-size:13px; margin-bottom:12px;">Request Example</h4>
-                <div class="code-block">
-                    <div class="code-block-header">
-                        <span class="code-block-label">JSON Request</span>
-                    </div>
-                    <pre>POST https://www.connect.chungwa.co.tz/api/chungwa/v1.0/nida/verify
-
-Headers:
-  Content-Type: application/json
-  username: chungwa
-  password: @Dmin2021!
-
-Body:
-{
-    "session_id": "nida_67a3b8c1d4e2f_abc123def456",
-    "answer": "Maria Shekimweri"
-}</pre>
-                </div>
-
-                <h4 style="color:#f1f5f9; font-size:13px; margin-bottom:12px;">Response Examples</h4>
-
-                <div class="code-block">
-                    <div class="code-block-header">
-                        <span class="code-block-label">Success Response (200)</span>
-                    </div>
-                    <pre>{
-    "responsecode": "00",
-    "responsedescription": "NIDA verification successful",
-    "user_info": {
-        "nin": "19900101123456789012",
-        "full_name": "Andendekisye Shekimweri",
-        "date_of_birth": "1985-05-15"
-    }
-}</pre>
-                </div>
-
-                <div class="code-block">
-                    <div class="code-block-header">
-                        <span class="code-block-label">Incorrect Answer Response (400)</span>
-                    </div>
-                    <pre>{
-    "responsecode": "54",
-    "responsedescription": "Incorrect answer",
-    "remaining_attempts": 2
-}</pre>
-                </div>
-
-                <div class="code-block">
-                    <div class="code-block-header">
-                        <span class="code-block-label">Max Attempts Exceeded Response (403)</span>
-                    </div>
-                    <pre>{
-    "responsecode": "54",
-    "responsedescription": "Maximum attempts exceeded. Verification failed.",
-    "remaining_attempts": 0
-}</pre>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Response Codes -->
     <div class="section" id="response-codes">
         <div class="section-title">Response Codes</div>
@@ -900,107 +725,69 @@ Body:
                     <p>Transaction was cancelled</p>
                 </div>
             </div>
+            <div class="response-code-card">
+                <div class="code-circle code-96">96</div>
+                <div class="code-info">
+                    <h4>System Error</h4>
+                    <p>Upstream provider error, please retry</p>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Supported FSPs -->
     <div class="section" id="supported-fsps">
         <div class="section-title">Supported FSPs</div>
-        <p>The following Financial Service Providers are supported for account lookup and fund transfers.</p>
-        <div class="fsp-grid">
-            <div class="fsp-card fsp-type-bank"><div class="fsp-code">003</div><div class="fsp-name">CRDB BANK</div></div>
-            <div class="fsp-card fsp-type-bank"><div class="fsp-code">013</div><div class="fsp-name">EXIM BANK</div></div>
-            <div class="fsp-card fsp-type-bank"><div class="fsp-code">015</div><div class="fsp-name">NBC BANK</div></div>
-            <div class="fsp-card fsp-type-bank"><div class="fsp-code">006</div><div class="fsp-name">STANBIC BANK</div></div>
-            <div class="fsp-card fsp-type-bank"><div class="fsp-code">011</div><div class="fsp-name">DIAMOND TRUST BANK</div></div>
-            <div class="fsp-card fsp-type-bank"><div class="fsp-code">009</div><div class="fsp-name">BANK OF AFRICA</div></div>
-            <div class="fsp-card fsp-type-bank"><div class="fsp-code">020</div><div class="fsp-name">ABSA BANK</div></div>
-            <div class="fsp-card fsp-type-bank"><div class="fsp-code">021</div><div class="fsp-name">I AND M BANK</div></div>
-            <div class="fsp-card fsp-type-bank"><div class="fsp-code">040</div><div class="fsp-name">ECOBANK</div></div>
-            <div class="fsp-card fsp-type-bank"><div class="fsp-code">046</div><div class="fsp-name">AMANA BANK</div></div>
-            <div class="fsp-card fsp-type-bank"><div class="fsp-code">031</div><div class="fsp-name">AZANIA BANK</div></div>
-            <div class="fsp-card fsp-type-bank"><div class="fsp-code">024</div><div class="fsp-name">DCB COMMERCIAL BANK</div></div>
-            <div class="fsp-card fsp-type-bank"><div class="fsp-code">034</div><div class="fsp-name">BANC ABC BANK</div></div>
-            <div class="fsp-card fsp-type-bank"><div class="fsp-code">039</div><div class="fsp-name">MKOMBOZI BANK</div></div>
-            <div class="fsp-card fsp-type-bank"><div class="fsp-code">048</div><div class="fsp-name">TPB BANK</div></div>
-            <div class="fsp-card fsp-type-mno"><div class="fsp-code">503</div><div class="fsp-name">M-PESA</div></div>
-            <div class="fsp-card fsp-type-mno"><div class="fsp-code">504</div><div class="fsp-name">AIRTEL</div></div>
-            <div class="fsp-card fsp-type-mno"><div class="fsp-code">501</div><div class="fsp-name">TIGO / ZANTEL</div></div>
-            <div class="fsp-card fsp-type-mno"><div class="fsp-code">506</div><div class="fsp-name">HALOTEL</div></div>
-        </div>
-    </div>
+        <p>The following Financial Service Providers are supported for account lookup and fund transfers. Use either the numeric code or FSP name in the <code style="color:#f97316">destinationFsp</code> field (case-insensitive).</p>
 
-    <!-- Test NINs -->
-    <div class="section" id="test-nins">
-        <div class="section-title">Test NINs for Verification</div>
-{{--        <p>Use these test NINs to simulate NIDA verification with the mock service:</p>--}}
-
-        <table class="params-table">
+        <h4 style="color:#f1f5f9; font-size:14px; margin-bottom:12px; margin-top:4px;">Banks</h4>
+        <table class="params-table" style="margin-bottom:28px;">
             <thead>
             <tr>
-                <th>NIN (20 digits)</th>
-                <th>Full Name</th>
-                <th>Mother's Name (Answer)</th>
-                <th>Birth Place (Alternate)</th>
+                <th>Numeric Code</th>
+                <th>FSP Name(s)</th>
+                <th>Institution</th>
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <td class="param-name">19900101123456789012</td>
-                <td>Andendekisye Shekimweri</td>
-                <td>Maria Shekimweri</td>
-                <td>Mbeya</td>
-            </tr>
-            <tr>
-                <td class="param-name">19900515234567890123</td>
-                <td>Mwinyi Kazimoto</td>
-                <td>Aisha Kazimoto</td>
-                <td>Dar es Salaam</td>
-            </tr>
-            <tr>
-                <td class="param-name">19991234567890123456</td>
-                <td>Fatuma Said Ally</td>
-                <td>Zainab Ally</td>
-                <td>Zanzibar</td>
-            </tr>
-            <tr>
-                <td class="param-name">19880321123456789123</td>
-                <td>John Peter Mbwambo</td>
-                <td>Anna Mbwambo</td>
-                <td>Arusha</td>
-            </tr>
-            <tr>
-                <td class="param-name">19951210123456789456</td>
-                <td>Sarah Hassan Juma</td>
-                <td>Fatma Hassan</td>
-                <td>Tanga</td>
-            </tr>
-            <tr>
-                <td class="param-name">19820115123456789789</td>
-                <td>Richard Samson Mtei</td>
-                <td>Grace Mtei</td>
-                <td>Kilimanjaro</td>
-            </tr>
-            <tr>
-                <td class="param-name">20000505123456789034</td>
-                <td>Amina Iddi Rashid</td>
-                <td>Mwanaisha Rashid</td>
-                <td>Morogoro</td>
-            </tr>
-            <tr>
-                <td class="param-name">19781120123456789234</td>
-                <td>Hamza Abdallah Kigoda</td>
-                <td>Zainabu Kigoda</td>
-                <td>Dodoma</td>
-            </tr>
+            <tr><td class="param-name">003</td><td>CRDB</td><td>CRDB Bank</td></tr>
+            <tr><td class="param-name">004</td><td>NMB</td><td>NMB Bank</td></tr>
+            <tr><td class="param-name">013</td><td>EXIM</td><td>Exim Bank</td></tr>
+            <tr><td class="param-name">015</td><td>NBC</td><td>NBC Bank</td></tr>
+            <tr><td class="param-name">006</td><td>STANBIC</td><td>Stanbic Bank</td></tr>
+            <tr><td class="param-name">011</td><td>DTB</td><td>Diamond Trust Bank</td></tr>
+            <tr><td class="param-name">009</td><td>BOA</td><td>Bank of Africa</td></tr>
+            <tr><td class="param-name">020</td><td>ABSA</td><td>ABSA Bank</td></tr>
+            <tr><td class="param-name">021</td><td>IMB</td><td>I&amp;M Bank</td></tr>
+            <tr><td class="param-name">040</td><td>ECOBANK</td><td>Ecobank Tanzania</td></tr>
+            <tr><td class="param-name">046</td><td>AMANA</td><td>Amana Bank</td></tr>
+            <tr><td class="param-name">031</td><td>AZANIA</td><td>Azania Bank</td></tr>
+            <tr><td class="param-name">024</td><td>DCB</td><td>DCB Commercial Bank</td></tr>
+            <tr><td class="param-name">034</td><td>BANCABC</td><td>BancABC</td></tr>
+            <tr><td class="param-name">039</td><td>MKOMBOZI</td><td>Mkombozi Bank</td></tr>
+            <tr><td class="param-name">048</td><td>TPB</td><td>TPB Bank</td></tr>
             </tbody>
         </table>
 
-        <div class="alert alert-success" style="margin-top: 16px;">
-            <strong>Note:</strong> The verification question will randomly ask for either "Mother's name" or "Birth place".
-            Answer exactly as shown in the table above (case-sensitive matching).
-        </div>
+        <h4 style="color:#f1f5f9; font-size:14px; margin-bottom:12px;">Mobile Money Operators</h4>
+        <table class="params-table">
+            <thead>
+            <tr>
+                <th>Numeric Code</th>
+                <th>FSP Name(s)</th>
+                <th>Operator</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr><td class="param-name">503</td><td>VODACOM / MPESA</td><td>Vodacom M-Pesa</td></tr>
+            <tr><td class="param-name">504</td><td>AIRTEL</td><td>Airtel Money</td></tr>
+            <tr><td class="param-name">501</td><td>TIGO / YAS</td><td>Tigo Pesa / Zantel</td></tr>
+            <tr><td class="param-name">506</td><td>HALOPESA / HALOTEL</td><td>Halotel HaloPesa</td></tr>
+            <tr><td class="param-name">507</td><td>AZAMPESA / AZAM</td><td>Azam Mobile Money</td></tr>
+            </tbody>
+        </table>
     </div>
+
 
 </main>
 

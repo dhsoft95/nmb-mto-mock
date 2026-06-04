@@ -142,6 +142,29 @@ class AccountLookupController extends Controller
         }
 
         $map = [
+            // numeric codes
+            '003' => 'CRDB',
+            '004' => 'NMB',
+            '013' => 'EXIM',
+            '015' => 'NBC',
+            '006' => 'STANBIC',
+            '011' => 'DTB',
+            '009' => 'BOA',
+            '020' => 'ABSA',
+            '021' => 'IMB',
+            '040' => 'ECOBANK',
+            '046' => 'AMANA',
+            '031' => 'AZANIA',
+            '024' => 'DCB',
+            '034' => 'BANCABC',
+            '039' => 'MKOMBOZI',
+            '048' => 'TPB',
+            '503' => 'VODACOM',
+            '504' => 'AIRTEL',
+            '501' => 'TIGO',
+            '506' => 'HALOPESA',
+            '507' => 'Azampesa',
+            // name aliases
             'CRDB'     => 'CRDB',
             'NMB'      => 'NMB',
             'NBC'      => 'NBC',
